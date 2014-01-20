@@ -1,4 +1,4 @@
-class Waypoint
+class Point
   attr_reader :lat, :lon
 
   def initialize(lat, lon)
