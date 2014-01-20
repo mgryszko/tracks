@@ -2,7 +2,8 @@ class Waypoint
   attr_reader :lat, :lon
 
   def initialize(lat, lon)
-    # TODO check lat and lon ranges 
+    raise ArgumentError, "latitude must be between -90.0 and 90.0 degrees" unless lat.between?(-90.0, 90.0)
+    raise ArgumentError, "longitude must be between -180.0 and 180.0 degrees" unless lon.between?(-180.0, 180.0)
     @lat = lat
     @lon = lon
   end
@@ -12,7 +13,6 @@ class Track
   attr_reader :points
 
   def initialize(*points)
-    # TODO track must have at least 2 points - really?
     @points = points
   end
 

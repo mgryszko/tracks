@@ -1,15 +1,31 @@
 require 'spec_helper'
 
 describe Waypoint do
-  it 'can be created with latitude and longitute' do
-    expect(Waypoint.new(1.0, 4.0).lat).to eq(1.0)
-    expect(Waypoint.new(1.0, 4.0).lon).to eq(4.0)
+  it 'out-of range latitudes raise ArgumentError' do
+    expect { Waypoint.new(-90.00001, 0.0) }.to raise_error(ArgumentError)
+    expect { Waypoint.new(-90.0, 0.0) }.not_to raise_error
+    expect { Waypoint.new(90.0, 0.0) }.not_to raise_error
+    expect { Waypoint.new(90.00001, 0.0) }.to raise_error(ArgumentError)
+  end 
+
+  it 'out-of range longitudes raise ArgumentError' do
+    expect { Waypoint.new(0.0, -180.00001) }.to raise_error(ArgumentError)
+    expect { Waypoint.new(0.0, -180.0) }.not_to raise_error
+    expect { Waypoint.new(0.0, 180.0) }.not_to raise_error
+    expect { Waypoint.new(0.0, 180.00001) }.to raise_error(ArgumentError)
   end 
 end
 
 describe TrackDistanceCalculator do
   before(:each) do
     @calc = double()
+  end
+
+  it 'empty track has zero distance' do
+    track = Track.new()
+    calculator = TrackDistanceCalculator.new(@calc)
+
+    expect(calculator.total_distance(track)).to eq(0.0)
   end
 
   it 'track consisting of a single point has zero distance' do
