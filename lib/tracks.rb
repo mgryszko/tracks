@@ -7,6 +7,10 @@ class Point
     @lat = lat
     @lon = lon
   end
+
+  def ==(other)
+    self.lat == other.lat && self.lon == other.lon
+  end
 end
 
 class Track
@@ -26,6 +30,7 @@ class TrackDistanceCalculator
     @calculator = calculator
   end
 
+  # TODO should distance be encapsulated in an object and support unit conversions?
   def total_distance(track)
     track.inject_on_adjacent(0.0) do |sum, pair|
       from, to = pair
@@ -43,5 +48,39 @@ class HaversineDistanceCalculator
 
   def distance_between(p1, p2)
     GeoDistance.distance(p1.lat, p1.lon, p2.lat, p2.lon).kms_to(:meters)
+  end
+end
+
+class TrackGpxRepository
+  require 'nokogiri'
+
+  def read_track_from(file)
+    File.open(file) do |f|
+      doc = parse(f) 
+      trackpoints = all_trackpoints_in(doc) 
+      create_track_from(trackpoints)
+    end
+  end
+
+  private
+
+  def parse(file)
+    Nokogiri::XML(file)
+  end
+
+  def all_trackpoints_in(doc)
+    doc.xpath('//xmlns:trkpt')
+  end
+
+  def create_track_from(trackpoints)
+    points = []
+    trackpoints.each do |tp|
+      points << to_point(tp)
+    end
+    Track.new(*points)
+  end
+
+  def to_point(trackpoint)
+    Point.new(trackpoint['lat'].to_f, trackpoint['lon'].to_f)
   end
 end

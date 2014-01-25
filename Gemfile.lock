@@ -45,8 +45,11 @@ GEM
       rb-inotify (>= 0.9)
     lumberjack (1.0.4)
     method_source (0.8.2)
+    mini_portile (0.5.2)
     minitest (4.7.5)
     multi_json (1.8.4)
+    nokogiri (1.6.1)
+      mini_portile (~> 0.5.0)
     pry (0.9.12.4)
       coderay (~> 1.0)
       method_source (~> 0.8)
@@ -78,4 +81,5 @@ DEPENDENCIES
   geo-distance
   growl
   guard-rspec
+  nokogiri
   rspec

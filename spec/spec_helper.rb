@@ -6,3 +6,12 @@ RSpec.configure do |config|
   config.filter_run :focus
   config.order = 'random'
 end
+
+module FileMatchers
+  extend RSpec::Matchers::DSL
+
+  matcher :be_file do |expected|
+    match {|actual| File.exists?(actual)}
+  end
+end
+
