@@ -22,7 +22,7 @@ describe CalculateTrackDistance do
     track = Track.new(*points)
     @repository.should_receive(:read_track_from).with('track.gpx').and_return(track)
 
-    distance = @calculator.calculate('track.gpx')
+    distance = @calculator.execute('track.gpx')
 
     expect(distance).to be_within(100).of(56970)
   end

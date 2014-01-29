@@ -4,7 +4,7 @@ class CalculateTrackDistance
     @calculator = calculator
   end
 
-  def calculate(file_name)
+  def execute(file_name)
     track = @repository.read_track_from(file_name)
     track.total_distance(@calculator)
   end
