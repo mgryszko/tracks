@@ -1,5 +1,33 @@
 require 'spec_helper'
 
+describe CalculateTrackDistance do
+  points = [
+    [38.65760, -0.10489],  
+    [38.70632, -0.10808],  
+    [38.72474, -0.05631],  
+    [38.76751, -0.05660],  
+    [38.82411, -0.07796],  
+    [38.84112, -0.11785],  
+    [38.87587, -0.09626],  
+    [38.91885, -0.11806],  
+    [38.83950, 0.11278],  
+  ].collect { |c| Point.new(*c) }
+
+  before(:each) do
+    @repository = double()
+    @calculator = CalculateTrackDistance.new(@repository, HaversineDistanceCalculator.new)
+  end
+
+  it 'calculates total track distance' do
+    track = Track.new(*points)
+    @repository.should_receive(:read_track_from).with('track.gpx').and_return(track)
+
+    distance = @calculator.calculate('track.gpx')
+
+    expect(distance).to be_within(100).of(56970)
+  end
+end
+
 describe Point do
   it 'out-of range latitudes raise ArgumentError' do
     expect { Point.new(-90.00001, 0.0) }.to raise_error(ArgumentError)
@@ -50,3 +78,4 @@ describe TrackDistanceCalculator do
     expect(@calculator.total_distance(track)).to eq(3.0)
   end
 end
+

@@ -1,3 +1,16 @@
+class CalculateTrackDistance
+  def initialize(track_repository, calculator)
+    @repository = track_repository
+    @calculator = calculator
+  end
+
+  def calculate(file_name)
+    track = @repository.read_track_from(file_name)
+    calculator = TrackDistanceCalculator.new(@calculator)
+    calculator.total_distance(track)
+  end
+end
+
 class Point
   attr_reader :lat, :lon
 
@@ -10,6 +23,10 @@ class Point
 
   def ==(other)
     self.lat == other.lat && self.lon == other.lon
+  end
+
+  def to_s
+    "(#{lat},#{lon})"
   end
 end
 
@@ -56,8 +73,8 @@ class TrackGpxRepository
 
   def read_track_from(file)
     File.open(file) do |f|
-      doc = parse(f) 
-      trackpoints = all_trackpoints_in(doc) 
+      doc = parse(f)
+      trackpoints = all_trackpoints_in(doc)
       create_track_from(trackpoints)
     end
   end
