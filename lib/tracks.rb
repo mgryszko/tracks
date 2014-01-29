@@ -6,8 +6,7 @@ class CalculateTrackDistance
 
   def calculate(file_name)
     track = @repository.read_track_from(file_name)
-    calculator = TrackDistanceCalculator.new(@calculator)
-    calculator.total_distance(track)
+    track.total_distance(@calculator)
   end
 end
 
@@ -30,6 +29,7 @@ class Point
   end
 end
 
+
 class Track
   attr_reader :points
 
@@ -37,24 +37,20 @@ class Track
     @points = points
   end
 
+  def total_distance(calculator)
+    inject_on_adjacent(0.0) do |sum, pair|
+      from, to = pair
+      sum + calculator.distance_between(from, to)
+    end
+  end
+
+  private 
+
   def inject_on_adjacent(initial, &block)
     @points.each_cons(2).inject(initial, &block)
   end
 end
 
-class TrackDistanceCalculator
-  def initialize(calculator)
-    @calculator = calculator
-  end
-
-  # TODO should distance be encapsulated in an object and support unit conversions?
-  def total_distance(track)
-    track.inject_on_adjacent(0.0) do |sum, pair|
-      from, to = pair
-      sum + @calculator.distance_between(from, to)
-    end
-  end
-end
 
 class HaversineDistanceCalculator
   require 'geo-distance'
