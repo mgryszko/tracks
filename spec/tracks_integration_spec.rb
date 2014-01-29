@@ -10,6 +10,7 @@ describe HaversineDistanceCalculator do
   cases.each do |ps, distance|
     it "calculates distance between #{ps[0]} and #{ps[1]}" do
       calc = HaversineDistanceCalculator.new
+
       expect(calc.distance_between(ps[0], ps[1])).to be_within(0.5).of(distance)
     end
   end
@@ -27,9 +28,9 @@ describe TrackGpxRepository do
     expect(track_file).to be_file
 
     track = @repository.read_track_from(track_file)
+
     expect(track.points.size).to eq(1398)
     expect(track.points[0]).to eq(Point.new(38.657604977488518, -0.10489197447896))
     expect(track.points[1397]).to eq(Point.new(38.839498981833458, 0.112783033400774))
-
   end
 end
