@@ -10,25 +10,6 @@ class CalculateTrackDistance
   end
 end
 
-class Point
-  attr_reader :lat, :lon
-
-  def initialize(lat, lon)
-    raise ArgumentError, "latitude must be between -90.0 and 90.0 degrees" unless lat.between?(-90.0, 90.0)
-    raise ArgumentError, "longitude must be between -180.0 and 180.0 degrees" unless lon.between?(-180.0, 180.0)
-    @lat = lat
-    @lon = lon
-  end
-
-  def ==(other)
-    self.lat == other.lat && self.lon == other.lon
-  end
-
-  def to_s
-    "(#{lat},#{lon})"
-  end
-end
-
 
 class Track
   attr_reader :points
@@ -52,6 +33,26 @@ class Track
 end
 
 
+class Point
+  attr_reader :lat, :lon
+
+  def initialize(lat, lon)
+    raise ArgumentError, "latitude must be between -90.0 and 90.0 degrees" unless lat.between?(-90.0, 90.0)
+    raise ArgumentError, "longitude must be between -180.0 and 180.0 degrees" unless lon.between?(-180.0, 180.0)
+    @lat = lat
+    @lon = lon
+  end
+
+  def ==(other)
+    self.lat == other.lat && self.lon == other.lon
+  end
+
+  def to_s
+    "(#{lat},#{lon})"
+  end
+end
+
+
 class HaversineDistanceCalculator
   require 'geo-distance'
 
@@ -63,6 +64,7 @@ class HaversineDistanceCalculator
     GeoDistance.distance(p1.lat, p1.lon, p2.lat, p2.lon).kms_to(:meters)
   end
 end
+
 
 class TrackGpxRepository
   require 'nokogiri'
