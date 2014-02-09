@@ -30,7 +30,7 @@ describe TrackGpxRepository do
     track = @repository.read_track_from(track_file)
 
     expect(track.points.size).to eq(1398)
-    expect(track.points[0]).to eq(Point.new(38.657604977488518, -0.10489197447896, 0.0))
-    expect(track.points[1397]).to eq(Point.new(38.839498981833458, 0.112783033400774, 0.0))
+    expect(track.points[0]).to eq(Point.new(38.657604977488518, -0.10489197447896, 186.60))
+    expect(track.points[1397]).to eq(Point.new(38.839498981833458, 0.112783033400774, 23.7))
   end
 end

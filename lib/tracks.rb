@@ -111,6 +111,18 @@ class TrackGpxRepository
   end
 
   def to_point(trackpoint)
-    Point.new(trackpoint['lat'].to_f, trackpoint['lon'].to_f, 0.0)
+    Point.new(lat_from(trackpoint), lon_from(trackpoint), elevation_from(trackpoint))
+  end
+
+  def lat_from(trackpoint)
+    trackpoint['lat'].to_f
+  end
+
+  def lon_from(trackpoint)
+    trackpoint['lon'].to_f
+  end
+
+  def elevation_from(trackpoint)
+    trackpoint.xpath('xmlns:ele').text.to_f
   end
 end
