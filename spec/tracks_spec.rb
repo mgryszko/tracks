@@ -1,80 +1,74 @@
 require 'spec_helper'
 
-describe CalculateTrackDistance do
-  points = [
-    [38.65760, -0.10489],  
-    [38.70632, -0.10808],  
-    [38.72474, -0.05631],  
-    [38.76751, -0.05660],  
-    [38.82411, -0.07796],  
-    [38.84112, -0.11785],  
-    [38.87587, -0.09626],  
-    [38.91885, -0.11806],  
-    [38.83950, 0.11278],  
-  ].collect { |c| Point.new(*c) }
-
+describe CalculateTrackStatistics do
   before(:each) do
     @repository = double()
-    @calculator = CalculateTrackDistance.new(@repository, HaversineDistanceCalculator.new)
+    @calculator = CalculateTrackStatistics.new(@repository, HaversineDistanceCalculator.new)
   end
 
-  it 'calculates total track distance' do
-    track = Track.new(*points)
-    @repository.should_receive(:read_track_from).with('track.gpx').and_return(track)
+  context 'multipoint track' do
+    points = [
+      [38.65760, -0.10489, 186.6],
+      [38.70632, -0.10808, 523.1],
+      [38.72474, -0.05631, 600.0],
+      [38.76751, -0.05660, 233.3],
+      [38.82411, -0.07796, 202.5],
+      [38.84112, -0.11785, 91],
+      [38.87587, -0.09626, 17],
+      [38.91885, -0.11806, 17],
+      [38.83950, 0.11278, 3],
+    ].collect { |c| Point.new(*c) }
 
-    distance = @calculator.execute('track.gpx')
+    it 'calculates track statistics' do
+      track = Track.new(*points)
+      @repository.should_receive(:read_track_from).with('track.gpx').and_return(track)
 
-    expect(distance).to be_within(100).of(56970)
+      stats = @calculator.execute('track.gpx')
+
+      expect(stats.distance).to be_within(100).of(56970)
+      expect(stats.ascent).to eq(413.4)
+    end
+  end
+
+  context 'one point track' do
+    it 'yields empty statistics' do
+      track = Track.new(Point.new(38.65760, -0.10489, 186.6))
+      @repository.should_receive(:read_track_from).with('track.gpx').and_return(track)
+
+      stats = @calculator.execute('track.gpx')
+
+      expect(stats.distance).to eq(0.0)
+      expect(stats.ascent).to eq(0.0)
+    end
+  end
+
+  context 'zero point track' do
+    it 'yields empty statistics' do
+      track = Track.new()
+      @repository.should_receive(:read_track_from).with('track.gpx').and_return(track)
+
+      stats = @calculator.execute('track.gpx')
+
+      expect(stats.distance).to eq(0.0)
+      expect(stats.ascent).to eq(0.0)
+    end
   end
 end
 
-describe Track do
-  before(:each) do
-    @calculator = double()
-    @p1, @p2, @p3 = Point.new(1.0, 2.0), Point.new(2.0, 3.0), Point.new(3.0, 4.0)
-  end
-
-  it 'empty track has zero distance' do
-    track = Track.new()
-
-    expect(track.total_distance(@calculator)).to eq(0.0)
-  end
-
-  it 'track consisting of a single point has zero distance' do
-    track = Track.new(@p1)
-
-    expect(track.total_distance(@calculator)).to eq(0.0)
-  end
-
-  it 'calculates total distance of a two-point track' do
-    track = Track.new(@p1, @p2)
-    @calculator.should_receive(:distance_between).with(@p1, @p2).and_return(1.0)
-
-    expect(track.total_distance(@calculator)).to eq(1.0)
-  end
-
-  it 'calculates total distance of a multi-point track' do
-    track = Track.new(@p1, @p2, @p3)
-    @calculator.should_receive(:distance_between).with(@p1, @p2).and_return(1.0)
-    @calculator.should_receive(:distance_between).with(@p2, @p3).and_return(2.0)
-
-    expect(track.total_distance(@calculator)).to eq(3.0)
-  end
-end
 
 describe Point do
   it 'out-of range latitudes raise ArgumentError' do
-    expect { Point.new(-90.00001, 0.0) }.to raise_error(ArgumentError)
-    expect { Point.new(-90.0, 0.0) }.not_to raise_error
-    expect { Point.new(90.0, 0.0) }.not_to raise_error
-    expect { Point.new(90.00001, 0.0) }.to raise_error(ArgumentError)
-  end 
+    expect { Point.new(-90.00001, 0.0, 0.0) }.to raise_error(ArgumentError)
+    expect { Point.new(-90.0, 0.0, 0.0) }.not_to raise_error
+    expect { Point.new(90.0, 0.0, 0.0) }.not_to raise_error
+    expect { Point.new(90.00001, 0.0, 0.0) }.to raise_error(ArgumentError)
+  end
 
   it 'out-of range longitudes raise ArgumentError' do
-    expect { Point.new(0.0, -180.00001) }.to raise_error(ArgumentError)
-    expect { Point.new(0.0, -180.0) }.not_to raise_error
-    expect { Point.new(0.0, 180.0) }.not_to raise_error
-    expect { Point.new(0.0, 180.00001) }.to raise_error(ArgumentError)
-  end 
+    expect { Point.new(0.0, -180.00001, 0.0) }.to raise_error(ArgumentError)
+    expect { Point.new(0.0, -180.0, 0.0) }.not_to raise_error
+    expect { Point.new(0.0, 180.0, 0.0) }.not_to raise_error
+    expect { Point.new(0.0, 180.00001, 0.0) }.to raise_error(ArgumentError)
+  end
 end
 
