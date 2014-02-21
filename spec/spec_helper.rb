@@ -1,4 +1,5 @@
 require_relative '../lib/tracks'
+require_relative '../lib/tracks_infrastructure'
 include Tracks
 
 RSpec.configure do |config|
