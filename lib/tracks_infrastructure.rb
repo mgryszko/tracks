@@ -1,6 +1,7 @@
+require 'nokogiri'
+
 module Tracks
   class TrackGpxRepository
-    require 'nokogiri'
 
     def read_track_from(file)
       File.open(file) do |f|

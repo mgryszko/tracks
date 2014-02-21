@@ -1,3 +1,5 @@
+require 'geo-distance'
+
 module Tracks
   class CalculateTrackStatistics
     def initialize(track_repository, calculator)
@@ -70,8 +72,6 @@ module Tracks
 
 
   class HaversineDistanceCalculator
-    require 'geo-distance'
-
     def initialize
       GeoDistance.default_algorithm = :haversine
     end
