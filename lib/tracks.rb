@@ -26,6 +26,7 @@ module Tracks
         from, to = pair
         stats.distance += calculator.distance_between(from, to)
         stats.ascent += ascent(from, to)
+        stats.total_time += time_between(from, to)
       end
       stats.avg_speed = points.length <= 1 ? 0 : stats.distance / (points.last.time - points.first.time)
       stats
@@ -39,6 +40,10 @@ module Tracks
 
     def ascent(from, to)
       (to.elevation - from.elevation if to.elevation > from.elevation) || 0.0
+    end
+
+    def time_between(from, to)
+      to.time - from.time
     end
   end
 
@@ -65,9 +70,9 @@ module Tracks
   end
 
 
-  class TrackStatistics < Struct.new(:distance, :ascent, :avg_speed)
+  class TrackStatistics < Struct.new(:distance, :ascent, :avg_speed, :total_time)
     def self.empty
-      TrackStatistics.new(0.0, 0.0, 0.0)
+      TrackStatistics.new(0.0, 0.0, 0.0, 0)
     end
   end
 end

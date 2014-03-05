@@ -32,6 +32,7 @@ describe CalculateTrackStatistics do
       expect(stats.distance).to be_within(100).of(56970)
       expect(stats.ascent).to eq(413.4)
       expect(stats.avg_speed).to be_within(0.05).of(3.59)
+      expect(stats.total_time).to eq(15866)
     end
   end
 
@@ -45,6 +46,7 @@ describe CalculateTrackStatistics do
       expect(stats.distance).to eq(0.0)
       expect(stats.ascent).to eq(0.0)
       expect(stats.avg_speed).to eq(0.0)
+      expect(stats.total_time).to eq(0)
     end
   end
 
@@ -58,6 +60,7 @@ describe CalculateTrackStatistics do
       expect(stats.distance).to eq(0.0)
       expect(stats.ascent).to eq(0.0)
       expect(stats.avg_speed).to eq(0.0)
+      expect(stats.total_time).to eq(0)
     end
   end
 end
