@@ -22,13 +22,7 @@ module Tracks
 
     def statistics(calculator)
       stats = TrackStatistics.empty
-      each_adjacent_points do |pair|
-        from, to = pair
-        stats.distance += calculator.distance_between(from, to)
-        stats.ascent += ascent(from, to)
-        stats.total_time += time_between(from, to)
-      end
-      stats.avg_speed = points.length <= 1 ? 0 : stats.distance / (points.last.time - points.first.time)
+      each_adjacent_points { |section| update_statistics(stats, section, calculator) }
       stats
     end
 
@@ -38,12 +32,40 @@ module Tracks
       @points.each_cons(2).each(&block)
     end
 
-    def ascent(from, to)
-      (to.elevation - from.elevation if to.elevation > from.elevation) || 0.0
+    def update_statistics(stats, section, calculator)
+        dist_so_far = stats.distance
+        v_avg_so_far = stats.avg_speed
+        dist, t, v, ascent = section_statistics(section, calculator)
+        stats.distance += dist
+        stats.ascent += ascent
+        stats.total_time += t
+        stats.avg_speed = avg_speed(v_avg_so_far, v, dist_so_far, dist)
+    end
+
+    def section_statistics(section, calculator)
+      from, to = section[0], section[1]
+      dist = calculator.distance_between(from, to)
+      t = time_between(from, to)
+      v = dist / t
+      ascent = ascent(from, to)
+      [dist, t, v, ascent]
     end
 
     def time_between(from, to)
       to.time - from.time
+    end
+
+    def ascent(from, to)
+      (to.elevation - from.elevation if to.elevation > from.elevation) || 0.0
+    end
+
+    def avg_speed(v_avg_so_far, v, dist_so_far, dist)
+        if v_avg_so_far == 0
+          v
+        else
+          v_avg_so_far * v * (dist_so_far + dist) / 
+            (dist_so_far * v + dist * v_avg_so_far)
+        end
     end
   end
 
