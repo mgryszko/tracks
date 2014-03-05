@@ -1,4 +1,5 @@
 require 'nokogiri'
+require 'geo-distance'
 
 module Tracks
   class TrackGpxRepository
@@ -30,7 +31,7 @@ module Tracks
     end
 
     def to_point(trackpoint)
-      Point.new(lat_from(trackpoint), lon_from(trackpoint), elevation_from(trackpoint))
+      Point.new(lat_from(trackpoint), lon_from(trackpoint), elevation_from(trackpoint), time_from(trackpoint))
     end
 
     def lat_from(trackpoint)
@@ -43,6 +44,21 @@ module Tracks
 
     def elevation_from(trackpoint)
       trackpoint.xpath('xmlns:ele').text.to_f
+    end
+
+    def time_from(trackpoint)
+      Time.iso8601(trackpoint.xpath('xmlns:time').text)
+    end
+  end
+
+
+  class HaversineDistanceCalculator
+    def initialize
+      GeoDistance.default_algorithm = :haversine
+    end
+
+    def distance_between(p1, p2)
+      GeoDistance.distance(p1.lat, p1.lon, p2.lat, p2.lon).kms_to(:meters)
     end
   end
 end

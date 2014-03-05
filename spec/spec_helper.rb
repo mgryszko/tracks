@@ -17,3 +17,9 @@ module FileMatchers
   end
 end
 
+module PointFixture
+  def point_2d(lat, lon)
+    Point.new(lat, lon, nil, nil)
+  end
+end
+

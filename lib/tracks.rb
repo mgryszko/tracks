@@ -1,4 +1,3 @@
-require 'geo-distance'
 
 module Tracks
   class CalculateTrackStatistics
@@ -26,12 +25,13 @@ module Tracks
       each_adjacent_points do |pair|
         from, to = pair
         stats.distance += calculator.distance_between(from, to)
-        stats.ascent += ascent(from, to) 
+        stats.ascent += ascent(from, to)
       end
+      stats.avg_speed = points.length <= 1 ? 0 : stats.distance / (points.last.time - points.first.time)
       stats
     end
 
-    private 
+    private
 
     def each_adjacent_points(&block)
       @points.each_cons(2).each(&block)
@@ -44,18 +44,19 @@ module Tracks
 
 
   class Point
-    attr_reader :lat, :lon, :elevation
+    attr_reader :lat, :lon, :elevation, :time
 
-    def initialize(lat, lon, elevation)
+    def initialize(lat, lon, elevation, time)
       raise ArgumentError, "latitude must be between -90.0 and 90.0 degrees" unless lat.between?(-90.0, 90.0)
       raise ArgumentError, "longitude must be between -180.0 and 180.0 degrees" unless lon.between?(-180.0, 180.0)
       @lat = lat
       @lon = lon
       @elevation = elevation
+      @time = time
     end
 
     def ==(other)
-      @lat == other.lat && @lon == other.lon && @elevation == other.elevation
+      @lat == other.lat && @lon == other.lon && @elevation == other.elevation && @time == other.time
     end
 
     def to_s
@@ -64,20 +65,9 @@ module Tracks
   end
 
 
-  class TrackStatistics < Struct.new(:distance, :ascent)
+  class TrackStatistics < Struct.new(:distance, :ascent, :avg_speed)
     def self.empty
-      TrackStatistics.new(0.0, 0.0)
-    end
-  end
-
-
-  class HaversineDistanceCalculator
-    def initialize
-      GeoDistance.default_algorithm = :haversine
-    end
-
-    def distance_between(p1, p2)
-      GeoDistance.distance(p1.lat, p1.lon, p2.lat, p2.lon).kms_to(:meters)
+      TrackStatistics.new(0.0, 0.0, 0.0)
     end
   end
 end
